@@ -92,9 +92,9 @@ export const footerLinks = [
     title: "Quick Links",
     links: [
       { name: "Home", url: "#" },
-      { name: "Services", url: "#" },
-      { name: "Work", url: "#" },
-      { name: "Contact", url: "#" },
+      { name: "Features", url: "#" },
+      { name: "Pricing", url: "#" },
+      { name: "FAQs", url: "#" },
     ],
   },
   {
@@ -108,8 +108,8 @@ export const footerLinks = [
     title: "Connect",
     links: [
       { name: "Twitter", url: "https://x.com/amaaan_malik/" },
-      { name: "LinkedIn", url: "#" },
-      { name: "GitHub", url: "#" },
+      { name: "LinkedIn", url: "https://linkedin.com/in/amaan-malik1" },
+      { name: "GitHub", url: "https://github.com/amaan-malik1" },
     ],
   },
 ];
