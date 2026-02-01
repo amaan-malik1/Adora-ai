@@ -4,7 +4,7 @@ import { UploadIcon, XIcon } from "lucide-react";
 
 const UploadZone = ({ label, file, onClear, onChange }: UploadZoneProps) => {
   return (
-    <div className="relative-group">
+    <div className="relative group">
       <div
         className={`relative h-64 rounded-2xl border-2 border-dashed
   transition-all duration-300 flex flex-col items-center justify-center
@@ -22,12 +22,9 @@ const UploadZone = ({ label, file, onClear, onChange }: UploadZoneProps) => {
               className="absolute inset-0 w-full h-full object-cover rounded-xl opacity-60"
             />
 
-            <div
-              className="absolute inset-0 flex items-center justify-center
-        opacity-0 group-hover:opacity-100 transition-opacity
-        bg-black/40 rounded-xl backdrop-blur-sm"
-            >
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-xl backdrop-blur-sm">
               <button
+                aria-label="Remove image"
                 type="button"
                 onClick={onClear}
                 className="p-2 rounded-full bg-white/10 hover:bg-red-500/20 text-white hover:text-red-400 transition-colors"
