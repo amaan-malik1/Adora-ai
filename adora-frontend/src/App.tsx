@@ -21,7 +21,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/generate" element={<Generate />} />
         <Route path="/result/:projectId" element={<Result />} />
-        <Route path="/my-generations" element={<MyGeneration />} />
+        <Route path="/my-generation" element={<MyGeneration />} />
         <Route path="/plans" element={<Plans />} />
         <Route path="/community" element={<Community />} />
         <Route path="/loading" element={<Loading />} />

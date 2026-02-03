@@ -26,9 +26,11 @@ const Community = () => {
   ) : (
     <div className="min-h-screen text-white p-6 md:p-12 my-28">
       <div className="max-w-6xl mx-auto">
-        <header>
-          <h1>Community</h1>
-          <p>Explore projects created by the community with Adora-Ai</p>
+        <header className="mb-12">
+          <h1 className="text-3xl md:text-4xl font-semibold mb-4">Community</h1>
+          <p className="text-gray-400">
+            Explore projects created by the community with Adora-Ai
+          </p>
         </header>
         {/* projects list */}
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 mt-8">
