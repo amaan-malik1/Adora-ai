@@ -13,7 +13,7 @@ const MyGeneration = () => {
     setTimeout(() => {
       setGenerations(dummyGenerations);
       setLoading(false);
-    }, 1000);
+    }, 3000);
   };
 
   useEffect(() => {
