@@ -2,7 +2,16 @@ import type React from "react";
 import type { Project } from "../types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2Icon } from "lucide-react";
+import {
+  EllipsisIcon,
+  ImageIcon,
+  Loader2Icon,
+  PlaySquareIcon,
+  Share2Icon,
+  Trash2Icon,
+} from "lucide-react";
+import { button } from "framer-motion/client";
+import { GhostButton, PrimaryButton } from "./Buttons";
 
 const ProjectCard = ({
   gen,
@@ -15,6 +24,19 @@ const ProjectCard = ({
 }) => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleDelete = async (id: string) => {
+    const confirm = window.confirm(
+      "Are you sure you want to delete this generation?",
+    );
+    if (!confirm) return;
+
+    console.log(id);
+  };
+
+  const togglePublish = async (projectId: string) => {
+    console.log(projectId);
+  };
 
   return (
     <div key={gen.id} className="mb-4 break-inside-avoid">
@@ -31,7 +53,6 @@ const ProjectCard = ({
               className={`absolute inset-0 w-full h-full object-cover transition duration-500 ${gen.generatedVideo ? "group-hover:opacity-0" : "group-hover:scale-105"}`}
             />
           )}
-
           {/* showing video  */}
           {gen.generatedVideo && (
             <video
@@ -45,44 +66,113 @@ const ProjectCard = ({
             />
           )}
 
+          {/* if no video or image yet */}
           {!gen.generatedVideo && !gen.generatedImage && (
             <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-black/20">
               <Loader2Icon className="size-7 animate-spin " />
             </div>
           )}
+
+          {/* status badge */}
+          <div className="absolute flex left-3 top-3 gap-2 items-center">
+            {/* for generation */}
+            {gen.isGenerating && (
+              <span className="text-xs px-2 py-1 bg-yellow-600/30 rounded-full">
+                Generating{" "}
+              </span>
+            )}
+
+            {/* for is published */}
+            {gen.isPublished && (
+              <span className="text-xs px-2 py-1 bg-green-600/30 rounded-full">
+                Published{" "}
+              </span>
+            )}
+          </div>
+
+          {/* action menu for my generations only */}
+          {!forCommunity && (
+            <div
+              onMouseDownCapture={() => {
+                setMenuOpen(true);
+              }}
+              onMouseLeave={() => {
+                setMenuOpen(false);
+              }}
+              className="absolute right-3 top-3 sm:opacity-0 group-hover:opacity-100 transition flex items-center gap-2"
+            >
+              <div className="absolute top-3 right-3">
+                <EllipsisIcon className="ml-auto bg-black/10 rounded-full p-1 size-7" />
+              </div>
+
+              <div className="flex flex-col items-end w-32 text-sm">
+                <ul
+                  className={`text-xs ${menuOpen ? "block" : "hidden"}
+        overflow-hidden right-0 peer-focus:block hover:block w-40
+        bg-black/50 backdrop-blur text-white border border-gray-500/50
+        rounded-lg shadow-md mt-2 py-1 z-10`}
+                >
+                  {/* menu options like share, download img or video */}
+                  {gen.generatedImage && (
+                    <a
+                      href="#"
+                      download
+                      className="flex gap-2 items-center px-4 py-2 hover:bg-black/10 cursor-pointer"
+                    >
+                      <ImageIcon size={14} /> Download Image
+                    </a>
+                  )}
+                  {gen.generatedVideo && (
+                    <a
+                      href="#"
+                      download
+                      className="flex gap-2 items-center px-4 py-2 hover:bg-black/10 cursor-pointer"
+                    >
+                      <PlaySquareIcon size={14} /> Download Video
+                    </a>
+                  )}
+                  {(gen.generatedVideo || gen.generatedImage) && (
+                    <button
+                      onClick={() => {
+                        navigator.share({
+                          url: gen.generatedVideo || gen.generatedImage,
+                          title: gen.productName,
+                          text: gen.productDescription,
+                        });
+                      }}
+                      className="w-full flex gap-2 items-center px-4 py-2 hover:bg-black/10 cursor-pointer"
+                    >
+                      <Share2Icon size={14} />
+                      Share
+                    </button>
+                  )}
+
+                  {/* handle delete project */}
+                  <button
+                    onClick={() => handleDelete(gen.id)}
+                    className="w-full flex gap-2 items-center px-4 py-2 hover:bg-red-950/10 text-red-400 cursor-pointer"
+                  >
+                    <Trash2Icon size={14} /> Delete
+                  </button>
+                </ul>
+              </div>
+            </div>
+          )}
+          {/* source images */}
+          {/* <div className="absolute right-3 bottom-3">
+            <img
+              src={gen.uploadedImage?.[0]}
+              alt="product"
+              className="w-16 h-16 object-cover rounded-full animate-float"
+            />
+            <img
+              src={gen.uploadedImage?.[1]}
+              alt="model"
+              className="w-16 h-16 object-cover rounded-full animate-float -ml-8"
+              style={{ animationDelay: "3s" }}
+            />
+          </div> */}
         </div>
-
-        {/* status badge */}
-        {/* <div className="absolute flex left-3 top-3 gap-2 items-center">
-          {/* for generation */}
-        {/* {gen.isGenerating && (
-            <span className="text-xs px-2 py-1 bg-yellow-600/30 rounded-full">
-              Generating{" "}
-            </span>
-          )}
-
-          {/* for is published */}
-        {/* {gen.isPublished && (
-            <span className="text-xs px-2 py-1 bg-green-600/30 rounded-full">
-              Published{" "}
-            </span>
-          )}
-        </div> */}
-
-        {/* source images */}
-        {/* <div className="absolute right-3 bottom-3">
-          <img
-            src={gen.uploadedImage?.[0] || ""}
-            alt="product"
-            className="w-16 h-16 object-cover rounded-full animate-float"
-          />
-          <img
-            src={gen.uploadedImage?.[1] || ""}
-            alt="model"
-            className="w-16 h-16 object-cover rounded-full animate-float -ml-8"
-            style={{ animationDelay: "3s" }}
-          />
-        </div> */}
 
         {/* details  */}
         <div className="p-4">
@@ -126,6 +216,27 @@ const ProjectCard = ({
                 User Prompt
                 {gen.userPrompt}
               </div>
+            </div>
+          )}
+
+          {/* buttons for details and public */}
+          {!forCommunity && (
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <GhostButton
+                onClick={() => {
+                  navigate(`/result/${gen.id}`);
+                  scrollTo(0, 0);
+                }}
+                className="text-xs justify-center"
+              >
+                View Details
+              </GhostButton>
+              <PrimaryButton
+                onClick={() => togglePublish(gen.id)}
+                className="rounded-md"
+              >
+                {gen.isPublished ? "Unpublish" : "Publish"}
+              </PrimaryButton>
             </div>
           )}
         </div>
