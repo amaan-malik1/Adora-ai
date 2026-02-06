@@ -158,8 +158,9 @@ const ProjectCard = ({
               </div>
             </div>
           )}
+
           {/* source images */}
-          {/* <div className="absolute right-3 bottom-3">
+          <div className="absolute right-3 bottom-3">
             <img
               src={gen.uploadedImage?.[0]}
               alt="product"
@@ -171,7 +172,7 @@ const ProjectCard = ({
               className="w-16 h-16 object-cover rounded-full animate-float -ml-8"
               style={{ animationDelay: "3s" }}
             />
-          </div> */}
+          </div>
         </div>
 
         {/* details  */}
