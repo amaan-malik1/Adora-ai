@@ -1,11 +1,23 @@
-import { MenuIcon, XIcon } from "lucide-react";
-import { PrimaryButton } from "./Buttons";
+import {
+  DollarSignIcon,
+  FolderEditIcon,
+  GalleryHorizontalEnd,
+  MenuIcon,
+  SparkleIcon,
+  XIcon,
+} from "lucide-react";
+import { GhostButton, PrimaryButton } from "./Buttons";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
+import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 
 export default function Navbar() {
+  const navigatge = useNavigate();
+  const { user } = useUser();
+  const { openSignIn, openSignUp } = useClerk();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
@@ -24,6 +36,7 @@ export default function Navbar() {
       transition={{ type: "spring", stiffness: 250, damping: 70, mass: 1 }}
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between bg-black/50 backdrop-blur-md border border-white/4 rounded-2xl p-3">
+        {/* logo */}
         <Link
           to={"/"}
           onClick={() => {
@@ -33,6 +46,7 @@ export default function Navbar() {
           <img src={assets.logo} alt="logo" className="h-8" />
         </Link>
 
+        {/* menu items */}
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300">
           {navLinks.map((link) => (
             <Link
@@ -48,18 +62,68 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="hidden md:flex items-center gap-3">
-          <button className="text-sm font-medium text-gray-300 hover:text-white transition max-sm:hidden">
-            Sign in
-          </button>
-          <PrimaryButton className="max-sm:text-xs hidden sm:inline-block">
-            Get Started
-          </PrimaryButton>
-        </div>
+        {/* login and signup btn */}
+        {!user ? (
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={() => {
+                openSignIn();
+              }}
+              className="text-sm font-medium text-gray-300 hover:text-white transition max-sm:hidden"
+            >
+              Sign in
+            </button>
+            <PrimaryButton
+              onClick={() => {
+                openSignUp();
+              }}
+              className="max-sm:text-xs hidden sm:inline-block"
+            >
+              Get Started
+            </PrimaryButton>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <GhostButton
+              onClick={() => navigatge("/plans")}
+              className="border-none text-gray-300 sm:py-1.5"
+            >
+              Credits:
+            </GhostButton>
 
-        <button onClick={() => setIsOpen(!isOpen)} className="md:hidden">
-          <MenuIcon className="size-6" />
-        </button>
+            {/* user btn as menu  */}
+            <UserButton>
+              <UserButton.MenuItems>
+                <UserButton.Action
+                  label="Generate"
+                  labelIcon={<SparkleIcon size={14} />}
+                  onClick={() => navigatge("/generate")}
+                />
+                <UserButton.Action
+                  label="My Generations"
+                  labelIcon={<FolderEditIcon size={14} />}
+                  onClick={() => navigatge("/my-generation")}
+                />
+                <UserButton.Action
+                  label="Community"
+                  labelIcon={<GalleryHorizontalEnd size={14} />}
+                  onClick={() => navigatge("/community")}
+                />
+                <UserButton.Action
+                  label="Plans"
+                  labelIcon={<DollarSignIcon size={14} />}
+                  onClick={() => navigatge("/plans")}
+                />
+              </UserButton.MenuItems>
+            </UserButton>
+          </div>
+        )}
+
+        {!user && (
+          <button onClick={() => setIsOpen(!isOpen)} className="md:hidden">
+            <MenuIcon className="size-6" />
+          </button>
+        )}
       </div>
       <div
         className={`flex flex-col items-center justify-center gap-6 text-lg font-medium fixed inset-0 bg-black/40 backdrop-blur-md z-50 transition-all duration-300 ${isOpen ? "translate-x-0" : "translate-x-full"}`}
@@ -71,12 +135,20 @@ export default function Navbar() {
         ))}
 
         <button
-          onClick={() => setIsOpen(false)}
+          onClick={() => {
+            setIsOpen(false);
+            openSignIn();
+          }}
           className="font-medium text-gray-300 hover:text-white transition"
         >
           Sign in
         </button>
-        <PrimaryButton onClick={() => setIsOpen(false)}>
+        <PrimaryButton
+          onClick={() => {
+            setIsOpen(false);
+            openSignUp();
+          }}
+        >
           Get Started
         </PrimaryButton>
 
