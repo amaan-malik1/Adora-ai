@@ -22,7 +22,7 @@ export const plansData = [
   {
     id: "starter",
     name: "Starter",
-    price: "$10",
+    price: "$9",
     desc: "Try the platform at not cost.",
     credits: 25,
     features: [
@@ -43,7 +43,7 @@ export const plansData = [
       "80 credits",
       "HD quality",
       "No watermark",
-      "video generation",
+      "Fast video generation",
       "Priority support",
     ],
     popular: true,
@@ -58,7 +58,7 @@ export const plansData = [
       "300 credits",
       "FHD quality",
       "No watermark",
-      "Fast generation speed",
+      "Fastest generation speed",
       "Chat + Email support",
     ],
   },
