@@ -13,8 +13,10 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@clerk/express": "^1.7.69",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
+    "@types/cors": "^2.8.19",
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
