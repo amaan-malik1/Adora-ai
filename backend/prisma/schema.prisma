@@ -14,15 +14,15 @@ datasource db {
 }
 
 model User {
-  id        String   @id
+  id        String    @id
   email     String?
   name      String?
   image     String?
-  credits   Int      @default(5)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  credits   Int       @default(5)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   // Relations
-  projects Project[]
+  projects  Project[]
 }
 
 model Project {
