@@ -8,9 +8,13 @@ import {
   Wand2Icon,
 } from "lucide-react";
 import { PrimaryButton } from "../components/Buttons";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import apiInstance from "../config/axios";
 
 const Generate = () => {
-  // const [name, setName] = useState("");
+  const [name, setName] = useState("");
   const [productName, setProductName] = useState("");
   const [productDesc, setProductDesc] = useState("");
   const [aspectRatio, setAspectRatio] = useState("9:16");
@@ -18,6 +22,10 @@ const Generate = () => {
   const [modelImg, setModelImg] = useState<File | null>(null);
   const [userPrompt, setUserPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+
+  const { user } = useUser();
+  const { getToken } = useAuth();
+  const navigate = useNavigate();
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -34,7 +42,42 @@ const Generate = () => {
 
   const handleGenerate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+    if (!user) {
+      return toast("Please login to generate");
+    }
+
+    if (!productImg || !modelImg || !name || !productName) {
+      return toast("Please fill all required fields");
+    }
+
+    try {
+      setIsGenerating(true);
+
+      //getting form data
+      const formData = new FormData();
+
+      formData.append("name", name);
+      formData.append("productName", productName);
+      formData.append("productDesc", productDesc);
+      formData.append("userPrompt", userPrompt);
+      formData.append("aspectRatio", aspectRatio);
+      formData.append("images", modelImg);
+      formData.append("images", productImg);
+
+      const token = await getToken();
+
+      const { data } = await apiInstance.post("/api/project/create", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success(data.message);
+      navigate("/result/" + data.projectId);
+    } catch (error) {
+      setIsGenerating(false);
+      toast.error(error?.response?.data?.error || error.message);
+    }
   };
 
   return (
@@ -71,7 +114,23 @@ const Generate = () => {
 
           {/* right col */}
           <div className="w-full">
-            {/* product Name */}
+            {/* project Name */}
+            <div className="mb-4 text-gray-300">
+              <label htmlFor="name" className="block text-sm mb-4">
+                Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Name your project"
+                required
+                className="w-full bg-white/3 rounded-lg border-2 p-4 text-sm border-violet-200/10 focus:border-violet-500/50 outline-none transition-all"
+              />
+            </div>
+
+            {/* product name */}
             <div className="mb-4 text-gray-300">
               <label htmlFor="name" className="block text-sm mb-4">
                 Product Name

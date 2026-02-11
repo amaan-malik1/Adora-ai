@@ -10,8 +10,12 @@ import {
   Share2Icon,
   Trash2Icon,
 } from "lucide-react";
-import { button } from "framer-motion/client";
+// import { button } from "framer-motion/client";
 import { GhostButton, PrimaryButton } from "./Buttons";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useAuth } from "@clerk/clerk-react";
+import apiInstance from "../config/axios";
 
 const ProjectCard = ({
   gen,
@@ -25,17 +29,62 @@ const ProjectCard = ({
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleDelete = async (id: string) => {
+  const { getToken } = useAuth();
+
+  const handleDelete = async (projectId: string) => {
     const confirm = window.confirm(
       "Are you sure you want to delete this generation?",
     );
     if (!confirm) return;
 
-    console.log(id);
+    try {
+      const token = await getToken();
+      const { data } = apiInstance.delete(`/api/user/publish/${projectId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setGeneration((generations) =>
+        generations.map((gen) =>
+          gen.id === projectId
+            ? { ...gen, isPublished: data.isPublished }
+            : gen,
+        ),
+      );
+      toast.success(
+        data.isPublished ? "Project published" : "Project unpublished",
+      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.error || "Something went wrong");
+      } else {
+        toast.error("Unexpected error occurred");
+      }
+
+      console.log("Error while generating video:", error);
+    }
   };
 
   const togglePublish = async (projectId: string) => {
-    console.log(projectId);
+    try {
+      const token = await getToken();
+      const { data } = apiInstance.get(`/api/project/${projectId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setGeneration((generations) =>
+        generations.filter((gen) => gen.id !== projectId),
+      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.error || "Something went wrong");
+      } else {
+        toast.error("Unexpected error occurred");
+      }
+
+      console.log("Error while generating video:", error);
+    }
   };
 
   return (

@@ -7,18 +7,24 @@ import {
   XIcon,
 } from "lucide-react";
 import { GhostButton, PrimaryButton } from "./Buttons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
-import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
+import { useAuth, useClerk, UserButton, useUser } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
+import apiInstance from "../config/axios";
 
 export default function Navbar() {
-  const navigatge = useNavigate();
+  const navigate = useNavigate();
   const { user } = useUser();
   const { openSignIn, openSignUp } = useClerk();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [credits, setCredits] = useState(0);
+
+  const { pathname } = useLocation();
+  const { getToken } = useAuth();
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -26,6 +32,32 @@ export default function Navbar() {
     { name: "Community", href: "/community" },
     { name: "Plans", href: "/plans" },
   ];
+
+  const getCreditsFromBackend = async () => {
+    // e.preventDefault();
+    try {
+      const token = await getToken();
+      if (!token) return toast("Please Login ");
+      const { data } = await apiInstance.get("/api/user/credit", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setCredits(data.credits);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to fetch credits");
+      console.log("Error while getting credits: ", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      (async () => {
+        await getCreditsFromBackend();
+      })();
+    }
+  }, [user, pathname]);
 
   return (
     <motion.nav
@@ -85,10 +117,10 @@ export default function Navbar() {
         ) : (
           <div className="flex gap-2">
             <GhostButton
-              onClick={() => navigatge("/plans")}
+              onClick={() => navigate("/plans")}
               className="border-none text-gray-300 sm:py-1.5"
             >
-              Credits:
+              Credits: {credits}
             </GhostButton>
 
             {/* user btn as menu  */}
@@ -97,22 +129,22 @@ export default function Navbar() {
                 <UserButton.Action
                   label="Generate"
                   labelIcon={<SparkleIcon size={14} />}
-                  onClick={() => navigatge("/generate")}
+                  onClick={() => navigate("/generate")}
                 />
                 <UserButton.Action
                   label="My Generations"
                   labelIcon={<FolderEditIcon size={14} />}
-                  onClick={() => navigatge("/my-generation")}
+                  onClick={() => navigate("/my-generation")}
                 />
                 <UserButton.Action
                   label="Community"
                   labelIcon={<GalleryHorizontalEnd size={14} />}
-                  onClick={() => navigatge("/community")}
+                  onClick={() => navigate("/community")}
                 />
                 <UserButton.Action
                   label="Plans"
                   labelIcon={<DollarSignIcon size={14} />}
-                  onClick={() => navigatge("/plans")}
+                  onClick={() => navigate("/plans")}
                 />
               </UserButton.MenuItems>
             </UserButton>

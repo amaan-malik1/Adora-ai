@@ -1,24 +1,53 @@
 import React, { useEffect, useState } from "react";
 import type { Project } from "../types";
-import { dummyGenerations } from "../assets/assets";
+// import { dummyGenerations } from "../assets/assets";
 import { Loader2Icon } from "lucide-react";
 import ProjectCard from "../components/ProjectCard";
 import { PrimaryButton } from "../components/Buttons";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
+import apiInstance from "../config/axios";
 
 const MyGeneration = () => {
   const [generations, setGenerations] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const { user, isLoaded } = useUser();
+  const { getToken } = useAuth();
+  const navigate = useNavigate();
+
   const fetchMyGenerations = async () => {
-    setTimeout(() => {
-      setGenerations(dummyGenerations);
+    try {
+      const token = await getToken();
+      if (!user || !token) {
+        return toast("Please Login!");
+      }
+      //getting users all projects
+      const { data } = await apiInstance.get("/api/user/projects", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setGenerations(data.projects);
       setLoading(false);
-    }, 3000);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.error || "Something went wrong");
+      } else {
+        toast.error("Unexpected error occurred");
+      }
+      console.log("Error while generating video:", error);
+    }
   };
 
   useEffect(() => {
-    fetchMyGenerations();
-  }, []);
+    if (user) {
+      fetchMyGenerations();
+    } else if (isLoaded && !user) {
+      navigate("/");
+    }
+  }, [user]);
 
   return loading ? (
     <div className="flex items-center justify-center min-h-screen">

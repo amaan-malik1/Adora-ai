@@ -117,8 +117,8 @@ export const createProject = async (req: Request, res: Response) => {
         };
 
         //feeding img base-64 to model
-        const image1 = loadImage(images[0].path, images[0].mimeType);
-        const image2 = loadImage(images[1].path, images[1].mimeType);
+        const image1 = loadImage(images[0].path, images[0].mimetype);
+        const image2 = loadImage(images[1].path, images[1].mimetype);
 
         const prompt = {
             text: `Combine the person and product into a realistic photo.

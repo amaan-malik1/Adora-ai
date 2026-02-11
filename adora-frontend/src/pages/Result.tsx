@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { dummyGenerations } from "../assets/assets";
 import type { Project } from "../types";
 import {
   ImageIcon,
@@ -8,27 +7,89 @@ import {
   SparkleIcon,
   VideoIcon,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { GhostButton, PrimaryButton } from "../components/Buttons";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import apiInstance from "../config/axios";
+import toast from "react-hot-toast";
+import axios, { AxiosError } from "axios";
 
 const Result = () => {
-  const [projects, setProjects] = useState<Project>({} as Project);
+  const [projects, setProjectsData] = useState<Project>({} as Project);
   const [loading, setLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const { projectId } = useParams();
+  const { getToken } = useAuth();
+  const { user, isLoaded } = useUser();
+  const navigate = useNavigate();
+
   const fetchProjectsData = async () => {
-    setTimeout(() => {
-      setProjects(dummyGenerations[0]);
+    try {
+      const token = await getToken();
+      const { data } = await apiInstance.get(`/api/user/result/${projectId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProjectsData(data.projects);
       setLoading(false);
-    }, 3000);
+      setIsGenerating(data.projects.isGenerating);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.error || "Something went wrong");
+      } else {
+        toast.error("Unexpected error occurred");
+      }
+
+      console.log("Error while fetching video data:", error);
+    }
   };
 
   useEffect(() => {
-    fetchProjectsData();
-  }, []);
+    if (user && !projects.id) {
+      fetchProjectsData();
+    } else if (isLoaded && !user) {
+      navigate("/");
+    }
+  }, [user]);
+
+  //fecth data every 10 sec
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchProjectsData();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [user, isGenerating]);
 
   const handleGenerateVideo = async () => {
     setIsGenerating(true);
+    try {
+      const token = await getToken();
+      const { data } = await apiInstance.post(
+        `/api/user/video/`,
+        { projectId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      setProjectsData((prev) => ({
+        ...prev,
+        generatedVideo: data.videoURL,
+        isGenerating: false,
+      }));
+
+      toast.success(data.message);
+      setIsGenerating(false);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.error || "Something went wrong");
+      } else {
+        toast.error("Unexpected error occurred");
+      }
+
+      console.log("Error while generating video:", error);
+    }
   };
 
   return loading ? (
