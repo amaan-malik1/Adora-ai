@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { clerkMiddleware } from "@clerk/express";
 import clerkWebHooks from "./controllers/clerk.js";
 import userRouter from "./routes/userRoute.js";
+import projectRouter from "./routes/projectRoutes.js";
 
 const app = express();
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(clerkMiddleware());
 
 //routes
 app.use('/api/user', userRouter);
+app.use('/api/project', projectRouter);
 
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);

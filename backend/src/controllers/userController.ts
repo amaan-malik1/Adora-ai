@@ -27,7 +27,8 @@ export const getUserCredits = async (req: Request, res: Response) => {
         })
     }
 }
-//get all project 
+
+//get all project for user 
 export const getAllprojects = async (req: Request, res: Response) => {
     try {
         const { userId } = req.auth();
@@ -56,6 +57,7 @@ export const getAllprojects = async (req: Request, res: Response) => {
         })
     }
 }
+
 //get oroject by id 
 export const getProjectById = async (req: Request, res: Response) => {
     try {
@@ -86,6 +88,7 @@ export const getProjectById = async (req: Request, res: Response) => {
         })
     }
 }
+
 //toggle the project 
 export const toggleProjectPublic = async (req: Request, res: Response) => {
     try {
@@ -94,8 +97,8 @@ export const toggleProjectPublic = async (req: Request, res: Response) => {
 
         const project = await prismaClient.project.findUnique({
             where: {
+                id: projectId as string,
                 userId,
-                id: projectId,
             },
         });
         if (!project) {

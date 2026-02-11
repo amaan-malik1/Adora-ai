@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import type { Project } from "../types";
-import { dummyGenerations } from "../assets/assets";
+// import { dummyGenerations } from "../assets/assets";
 import { Loader2Icon } from "lucide-react";
 import ProjectCard from "../components/ProjectCard";
+import apiInstance from "../config/axios";
 
 const Community = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchProjects = async () => {
-    setTimeout(() => {
-      setProjects(dummyGenerations);
-      setLoading(false);
-    }, 3000);
+    const { data } = await apiInstance.get("/api/project/published-projects");
+    setProjects(data.projects);
+    setLoading(false);
   };
 
   useEffect(() => {
