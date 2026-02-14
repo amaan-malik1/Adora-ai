@@ -56,11 +56,12 @@ export const getAllprojects = async (req: Request, res: Response) => {
             projects: allProjects
         })
     } catch (error) {
-        console.log("Error while getting user's all project!" + error);
-        res.status(500).json({
+        const message = error instanceof Error ? error.message : String(error);
+        console.error("Error while getting user's all projects:", message);
+        return res.status(500).json({
             success: false,
-            message: error
-        })
+            message: "Failed to load projects",
+        });
     }
 }
 
@@ -87,11 +88,12 @@ export const getProjectById = async (req: Request, res: Response) => {
         });
 
     } catch (error) {
-        console.log("Error while getting user's project with id!" + error);
-        res.status(500).json({
+        const message = error instanceof Error ? error.message : String(error);
+        console.error("Error while getting project by id:", message);
+        return res.status(500).json({
             success: false,
-            message: error
-        })
+            message: "Failed to load project",
+        });
     }
 }
 
@@ -132,10 +134,11 @@ export const toggleProjectPublic = async (req: Request, res: Response) => {
         });
 
     } catch (error) {
-        console.log("Error while toggling!" + error);
-        res.status(500).json({
+        const message = error instanceof Error ? error.message : String(error);
+        console.error("Error while toggling publish:", message);
+        return res.status(500).json({
             success: false,
-            message: error
-        })
+            message: "Failed to update publish status",
+        });
     }
 }

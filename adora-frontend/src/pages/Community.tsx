@@ -10,9 +10,14 @@ const Community = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchProjects = async () => {
-    const { data } = await apiInstance.get("/api/project/published-projects");
-    setProjects(data.projects);
-    setLoading(false);
+    try {
+      const { data } = await apiInstance.get("/api/project/published-projects");
+      setProjects(data.projects ?? []);
+    } catch {
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

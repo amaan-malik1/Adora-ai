@@ -352,10 +352,12 @@ export const getAllPublishedProjects = async (req: Request, res: Response) => {
             projects: allProjects
         })
     } catch (error) {
-        console.log("Error while : ", error)
-        res.json({
-            message: "Task not done!" + error
-        })
+        const message = error instanceof Error ? error.message : String(error);
+        console.error("Error while fetching published projects:", message);
+        return res.status(500).json({
+            projects: [],
+            message: "Failed to load projects",
+        });
     }
 }
 
@@ -391,10 +393,11 @@ export const deleteProject = async (req: Request, res: Response) => {
         })
 
     } catch (error) {
-        console.log("Error while deleting project: ", error)
-        res.json({
-            message: "Task not done!" + error
-        })
-
+        const message = error instanceof Error ? error.message : String(error);
+        console.error("Error while deleting project:", message);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to delete project",
+        });
     }
 } 
