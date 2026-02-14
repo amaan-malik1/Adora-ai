@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import { prismaClient } from "../config/prisma.js";
 import { v2 as cloudinary } from "cloudinary";
 import { HarmCategory, HarmBlockThreshold } from "@google/genai";
-import { GenerateContentConfig } from "@google/genai";
 import fs from "fs"
 import ai from "../config/ai.js";
 import axios from "axios";
@@ -32,10 +31,10 @@ export const createProject = async (req: Request, res: Response) => {
         targetLength = 5,
     } = req.body;
 
-    const images: any = req.files;
+    const images: Express.Multer.File[] = Array.isArray(req.files) ? req.files : [];
 
     try {
-        if (images.length() < 2 || !productName) {
+        if (images.length < 2 || !productName) {
             return res.status(400).json({
                 message: "Please upload atleast 2 images"
             })
@@ -87,7 +86,7 @@ export const createProject = async (req: Request, res: Response) => {
         //gemini API for img generation
         const model = 'gemini-3-pro-image-preview';
 
-        const generateContentConfig: GenerateContentConfig = {
+        const generateContentConfig = {
             maxOutputTokens: 32768,
             temperature: 1,
             topK: 0.95,
@@ -316,28 +315,29 @@ export const createVideo = async (req: Request, res: Response) => {
         })
 
     } catch (error: any) {
-        await prismaClient.project.update({
-            where: { id: projectId },
-            data: {
-                isGenerating: false,
-                error: error.message
-            }
-        });
+        if (projectId) {
+            await prismaClient.project.update({
+                where: { id: projectId },
+                data: {
+                    isGenerating: false,
+                    error: error.message
+                }
+            });
+        }
 
         if (isCreditsDeducted) {
             await prismaClient.user.update({
-
                 where: { id: userId as string },
                 data: {
                     credits: { increment: 10 }
                 }
-            })
+            });
         }
 
-        console.log("Error while : ", error)
-        res.json({
-            message: "Task not done!" + error
-        })
+        console.log("Error while creating video:", error);
+        res.status(500).json({
+            message: "Task not done!" + (error?.message ?? String(error))
+        });
     }
 }
 

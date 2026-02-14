@@ -32,23 +32,43 @@ const ProjectCard = ({
   const { getToken } = useAuth();
 
   const handleDelete = async (projectId: string) => {
-    const confirm = window.confirm(
+    const confirmed = window.confirm(
       "Are you sure you want to delete this generation?",
     );
-    if (!confirm) return;
+    if (!confirmed) return;
 
     try {
       const token = await getToken();
-      const { data } = apiInstance.delete(`/api/user/publish/${projectId}`, {
+      await apiInstance.delete(`/api/project/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setGeneration((generations) =>
+      setGeneration?.((generations) =>
+        generations.filter((gen) => gen.id !== projectId),
+      );
+      toast.success("Project deleted");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      } else {
+        toast.error("Unexpected error occurred");
+      }
+      console.log("Error while deleting project:", error);
+    }
+  };
+
+  const togglePublish = async (projectId: string) => {
+    try {
+      const token = await getToken();
+      const { data } = await apiInstance.get(`/api/user/publish/${projectId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setGeneration?.((generations) =>
         generations.map((gen) =>
-          gen.id === projectId
-            ? { ...gen, isPublished: data.isPublished }
-            : gen,
+          gen.id === projectId ? { ...gen, isPublished: data.isPublished } : gen,
         ),
       );
       toast.success(
@@ -56,34 +76,11 @@ const ProjectCard = ({
       );
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.error || "Something went wrong");
+        toast.error(error.response?.data?.message || "Something went wrong");
       } else {
         toast.error("Unexpected error occurred");
       }
-
-      console.log("Error while generating video:", error);
-    }
-  };
-
-  const togglePublish = async (projectId: string) => {
-    try {
-      const token = await getToken();
-      const { data } = apiInstance.get(`/api/project/${projectId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setGeneration((generations) =>
-        generations.filter((gen) => gen.id !== projectId),
-      );
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.error || "Something went wrong");
-      } else {
-        toast.error("Unexpected error occurred");
-      }
-
-      console.log("Error while generating video:", error);
+      console.log("Error while toggling publish:", error);
     }
   };
 
@@ -211,12 +208,12 @@ const ProjectCard = ({
           {/* source images */}
           <div className="absolute right-3 bottom-3">
             <img
-              src={gen.uploadedImage?.[0]}
+              src={gen.uploadedImages?.[0]}
               alt="product"
               className="w-16 h-16 object-cover rounded-full animate-float"
             />
             <img
-              src={gen.uploadedImage?.[1]}
+              src={gen.uploadedImages?.[1]}
               alt="model"
               className="w-16 h-16 object-cover rounded-full animate-float -ml-8"
               style={{ animationDelay: "3s" }}

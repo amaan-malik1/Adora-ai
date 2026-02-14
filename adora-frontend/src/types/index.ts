@@ -29,4 +29,5 @@ export interface Project {
   createdAt?: Date | string;
   updatedAt?: Date | string;
   uploadedImage?: string[];
+  uploadedImages?: string[];
 }

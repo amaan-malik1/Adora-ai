@@ -27,46 +27,50 @@ const Result = () => {
   const fetchProjectsData = async () => {
     try {
       const token = await getToken();
-      const { data } = await apiInstance.get(`/api/user/result/${projectId}`, {
+      const { data } = await apiInstance.get(`/api/user/project/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProjectsData(data.projects);
+      const project = data.project;
+      if (project) {
+        setProjectsData(project);
+        setIsGenerating(project.isGenerating);
+      }
       setLoading(false);
-      setIsGenerating(data.projects.isGenerating);
     } catch (error: unknown) {
+      setLoading(false);
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.error || "Something went wrong");
+        toast.error(error.response?.data?.message || "Something went wrong");
       } else {
         toast.error("Unexpected error occurred");
       }
-
       console.log("Error while fetching video data:", error);
     }
   };
 
   useEffect(() => {
-    if (user && !projects.id) {
+    if (user && projectId) {
       fetchProjectsData();
     } else if (isLoaded && !user) {
       navigate("/");
     }
-  }, [user]);
+  }, [user, projectId]);
 
-  //fecth data every 10 sec
+  // Poll for project updates every 10s while generating
   useEffect(() => {
+    if (!user || !projectId) return;
     const interval = setInterval(() => {
       fetchProjectsData();
     }, 10000);
-
     return () => clearInterval(interval);
-  }, [user, isGenerating]);
+  }, [user, projectId, isGenerating]);
 
   const handleGenerateVideo = async () => {
+    if (!projectId) return;
     setIsGenerating(true);
     try {
       const token = await getToken();
       const { data } = await apiInstance.post(
-        `/api/user/video/`,
+        "/api/project/video",
         { projectId },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -80,14 +84,13 @@ const Result = () => {
       }));
 
       toast.success(data.message);
-      setIsGenerating(false);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.error || "Something went wrong");
+        toast.error(error.response?.data?.message || "Something went wrong");
       } else {
         toast.error("Unexpected error occurred");
       }
-
+      setIsGenerating(false);
       console.log("Error while generating video:", error);
     }
   };

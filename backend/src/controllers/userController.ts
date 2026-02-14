@@ -1,30 +1,36 @@
 import type { Request, Response } from "express";
 import { prismaClient } from "../config/prisma.js";
 
-//getUserCredits 
+//getUserCredits – ensures user exists in DB (syncs from Clerk if webhook missed)
 export const getUserCredits = async (req: Request, res: Response) => {
     try {
         const { userId } = req.auth();
         if (!userId) {
-            return res.json({
-                message: "Unauthorized!"
-            })
+            return res.status(401).json({ message: "Unauthorized!" });
         }
 
-        const user = await prismaClient.user.findUnique({
-            where: { id: userId as string }
+        const id = userId as string;
+        let user = await prismaClient.user.findUnique({
+            where: { id },
         });
 
-        res.json({
-            credits: user?.credits
-        })
+        // If user exists in Clerk but not in DB (e.g. webhook not run yet), create with defaults
+        if (!user) {
+            user = await prismaClient.user.upsert({
+                where: { id },
+                create: { id },
+                update: {},
+            });
+        }
 
+        return res.json({ credits: user.credits });
     } catch (error) {
-        console.log("Error while getting user credits!" + error);
-        res.status(500).json({
+        const message = error instanceof Error ? error.message : String(error);
+        console.error("Error while getting user credits:", message);
+        return res.status(500).json({
             success: false,
-            message: error
-        })
+            message: "Failed to load credits",
+        });
     }
 }
 
@@ -40,14 +46,14 @@ export const getAllprojects = async (req: Request, res: Response) => {
 
         const allProjects = await prismaClient.project.findMany({
             where: {
-                id: userId as string
+                userId: userId as string
             },
             orderBy: { createdAt: 'desc' }
         });
 
         res.status(201).json({
             success: true,
-            rpojects: allProjects
+            projects: allProjects
         })
     } catch (error) {
         console.log("Error while getting user's all project!" + error);

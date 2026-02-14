@@ -6,7 +6,8 @@
   "scripts": {
     "start": "tsx src/server.ts",
     "dev": "nodemon --exec tsx src/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "render:build": "prisma generate && prisma migrate deploy"
   },
   "keywords": [],
   "author": "",

@@ -32,12 +32,13 @@ const MyGeneration = () => {
       setGenerations(data.projects);
       setLoading(false);
     } catch (error: unknown) {
+      setLoading(false);
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.error || "Something went wrong");
+        toast.error(error.response?.data?.message || "Something went wrong");
       } else {
         toast.error("Unexpected error occurred");
       }
-      console.log("Error while generating video:", error);
+      console.log("Error while fetching projects:", error);
     }
   };
 
