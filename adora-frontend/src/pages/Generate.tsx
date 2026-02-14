@@ -12,6 +12,7 @@ import { useAuth, useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import apiInstance from "../config/axios";
+import axios from "axios";
 
 const Generate = () => {
   const [name, setName] = useState("");
@@ -74,9 +75,10 @@ const Generate = () => {
 
       toast.success(data.message);
       navigate("/result/" + data.projectId);
-    } catch (error) {
-      setIsGenerating(false);
-      toast.error(error?.response?.data?.error || error.message);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        console.log(err.response?.data?.message);
+      }
     }
   };
 

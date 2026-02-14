@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3001;
 if (!process.env.DATABASE_URL) console.warn("[startup] DATABASE_URL is not set – DB routes will fail");
 if (!process.env.CLERK_SECRET_KEY) console.warn("[startup] CLERK_SECRET_KEY is not set – auth routes may fail");
 
-// middleware
+// Middleware (Clerk needs CLERK_PUBLISHABLE_KEY + CLERK_SECRET_KEY in .env)
 app.use(cors());
 
 // Health check (no auth, no DB) – confirm app is up on Render

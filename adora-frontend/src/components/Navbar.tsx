@@ -14,6 +14,7 @@ import { assets } from "../assets/assets";
 import { useAuth, useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 import apiInstance from "../config/axios";
+import axios from "axios";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -45,9 +46,10 @@ export default function Navbar() {
       });
 
       setCredits(data.credits);
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to fetch credits");
-      console.log("Error while getting credits: ", error);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        console.log(err.response?.data?.message);
+      }
     }
   };
 

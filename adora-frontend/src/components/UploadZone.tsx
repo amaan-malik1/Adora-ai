@@ -1,4 +1,3 @@
-import React from "react";
 import type { UploadZoneProps } from "../types";
 import { UploadIcon, XIcon } from "lucide-react";
 

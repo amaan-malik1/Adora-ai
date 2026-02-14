@@ -12,7 +12,7 @@ import { GhostButton, PrimaryButton } from "../components/Buttons";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import apiInstance from "../config/axios";
 import toast from "react-hot-toast";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 const Result = () => {
   const [projects, setProjectsData] = useState<Project>({} as Project);
