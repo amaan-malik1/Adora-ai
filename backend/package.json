@@ -14,7 +14,7 @@
   "type": "module",
   "dependencies": {
     "@clerk/express": "^1.7.69",
-    "@google/genai": "^1.40.0",
+    "@google/genai": "^1.41.0",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@types/axios": "^0.9.36",
@@ -23,7 +23,7 @@
     "axios": "^1.13.5",
     "cloudinary": "^2.9.0",
     "cors": "^2.8.6",
-    "dotenv": "^17.2.4",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "multer": "^2.0.2",
     "pg": "^8.18.0"
