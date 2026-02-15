@@ -1,4 +1,4 @@
-import express from "express";
+import express, { type NextFunction, type Request, type Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { clerkMiddleware } from "@clerk/express";
@@ -21,7 +21,6 @@ app.use(
     origin: [
       process.env.FRONTEND_URL as string,
       "http://localhost:5173",
-      //"http://localhost:5174", // Support both Vite default ports
     ],
     credentials: true,
   })
@@ -29,7 +28,7 @@ app.use(
 
 
 // Health check 
-app.get("/api/health", (_req, res) => {
+app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
@@ -44,7 +43,7 @@ app.use("/api/user", userRouter);
 app.use("/api/project", projectRouter);
 
 // Global error handler – log full error in Render logs so we can debug 500s
-app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("[server error]", err?.message);
   console.error(err?.stack);
   res.status(500).json({ error: "Internal Server Error" });

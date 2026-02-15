@@ -37,22 +37,25 @@ export default function Navbar() {
   ];
 
   const getCreditsFromBackend = async () => {
-    // e.preventDefault();
     try {
       const token = await getToken();
+      console.log("token: ", token);
+
       if (!token) return toast("Please Login ");
+      console.log("Api instance: ", apiInstance);
+
       const { data } = await apiInstance.get("/api/user/credit", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      console.log("usser credits at nav: ", data);
+      console.log("user credits at nav: ", data);
 
       setCredits(data.credits);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        console.log(err.response?.data?.message);
+        console.log("Error fetching credits: " + err.response?.data?.message);
       }
     }
   };

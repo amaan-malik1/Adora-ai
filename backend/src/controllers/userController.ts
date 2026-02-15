@@ -17,7 +17,7 @@ export const getUserCredits = async (req: Request, res: Response) => {
         console.log("User data at get credits: ", user);
 
 
-        return res.json({ credits: user?.credits  });
+        return res.json({ credits: user?.credits });
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.error("Error while getting user credits:", message);
