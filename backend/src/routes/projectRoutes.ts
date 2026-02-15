@@ -1,7 +1,7 @@
 import express from "express"
 import { createProject, createVideo, deleteProject, getAllPublishedProjects } from "../controllers/projectController.js";
 import { protectRoute } from "../middleware/protectRoute.js";
-import upload from "../config/multer.js";
+import upload from "../lib/multer.js";
 
 const projectRouter = express.Router();
 

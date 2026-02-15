@@ -1,29 +1,23 @@
 import type { Request, Response } from "express";
-import { prismaClient } from "../config/prisma.js";
+import { prismaClient } from "../lib/prisma.js";
 
-//getUserCredits – ensures user exists in DB (syncs from Clerk if webhook missed)
+//getUserCredits 
 export const getUserCredits = async (req: Request, res: Response) => {
     try {
         const { userId } = req.auth();
+        // console.log("UserId at credits controller: ", userId);
+
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized!" });
         }
 
-        const id = userId as string;
-        let user = await prismaClient.user.findUnique({
-            where: { id },
+        const user = await prismaClient.user.findUnique({
+            where: { id: userId as string }
         });
+        console.log("User data at get credits: ", user);
 
-        // If user exists in Clerk but not in DB (e.g. webhook not run yet), create with defaults
-        if (!user) {
-            user = await prismaClient.user.upsert({
-                where: { id },
-                create: { id },
-                update: {},
-            });
-        }
 
-        return res.json({ credits: user.credits });
+        return res.json({ credits: user?.credits  });
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.error("Error while getting user credits:", message);
@@ -34,8 +28,8 @@ export const getUserCredits = async (req: Request, res: Response) => {
     }
 }
 
-//get all project for user 
-export const getAllprojects = async (req: Request, res: Response) => {
+//get all my project
+export const getMyAllprojects = async (req: Request, res: Response) => {
     try {
         const { userId } = req.auth();
         if (!userId) {
@@ -44,7 +38,7 @@ export const getAllprojects = async (req: Request, res: Response) => {
             })
         }
 
-        const allProjects = await prismaClient.project.findMany({
+        const myAllProjects = await prismaClient.project.findMany({
             where: {
                 userId: userId as string
             },
@@ -53,7 +47,7 @@ export const getAllprojects = async (req: Request, res: Response) => {
 
         res.status(201).json({
             success: true,
-            projects: allProjects
+            myProjects: myAllProjects
         })
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -73,18 +67,19 @@ export const getProjectById = async (req: Request, res: Response) => {
 
         const project = await prismaClient.project.findUnique({
             where: {
+                id: projectId as string,
+                //@ts-ignore
                 userId,
-                id: projectId,
             },
         });
         if (!project) {
             return res.status(404).json({
-                message: "Project not found!"
+                message: "Project not found or create new projects!"
             })
         }
 
         res.status(201).json({
-            project
+            projectWithId: project
         });
 
     } catch (error) {
@@ -106,6 +101,7 @@ export const toggleProjectPublic = async (req: Request, res: Response) => {
         const project = await prismaClient.project.findUnique({
             where: {
                 id: projectId as string,
+                //@ts-ignore
                 userId,
             },
         });
@@ -122,7 +118,7 @@ export const toggleProjectPublic = async (req: Request, res: Response) => {
 
         await prismaClient.project.update({
             where: {
-                id: projectId
+                id: projectId as string
             },
             data: {
                 isPublished: !project.isPublished

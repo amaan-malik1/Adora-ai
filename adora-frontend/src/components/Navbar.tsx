@@ -19,6 +19,8 @@ import axios from "axios";
 export default function Navbar() {
   const navigate = useNavigate();
   const { user } = useUser();
+  // console.log("user details at nav:", user);
+
   const { openSignIn, openSignUp } = useClerk();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -44,6 +46,8 @@ export default function Navbar() {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      console.log("usser credits at nav: ", data);
 
       setCredits(data.credits);
     } catch (err) {

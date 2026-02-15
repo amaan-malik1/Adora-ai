@@ -19,8 +19,9 @@ if (!process.env.CLERK_SECRET_KEY) console.warn("[startup] CLERK_SECRET_KEY is n
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
       process.env.FRONTEND_URL as string,
+      "http://localhost:5173",
+      //"http://localhost:5174", // Support both Vite default ports
     ],
     credentials: true,
   })

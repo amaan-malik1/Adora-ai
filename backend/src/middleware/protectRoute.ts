@@ -1,4 +1,4 @@
-import e, { type NextFunction, type Request, type Response } from "express";
+import { type NextFunction, type Request, type Response } from "express";
 
 export const protectRoute = async (req: Request, res: Response, next: NextFunction) => {
     try {
