@@ -3,7 +3,7 @@ import { getMyAllprojects, getProjectById, getUserCredits, toggleProjectPublic }
 import { protectRoute } from "../middleware/protectRoute.js";
 const userRouter = express.Router();
 
-userRouter.get('/credit', protectRoute, getUserCredits);
+userRouter.get('/credits', protectRoute, getUserCredits);
 userRouter.get('/projects', protectRoute, getMyAllprojects);
 userRouter.get('/project/:projectId', protectRoute, getProjectById);
 userRouter.get('/publish/:projectId', protectRoute, toggleProjectPublic);

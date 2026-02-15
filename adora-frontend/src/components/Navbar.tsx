@@ -9,7 +9,7 @@ import {
 import { GhostButton, PrimaryButton } from "./Buttons";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { useAuth, useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
@@ -19,14 +19,14 @@ import axios from "axios";
 export default function Navbar() {
   const navigate = useNavigate();
   const { user } = useUser();
-  // console.log("user details at nav:", user);
+  console.log("user details at nav:", user);
 
   const { openSignIn, openSignUp } = useClerk();
 
   const [isOpen, setIsOpen] = useState(false);
   const [credits, setCredits] = useState(0);
 
-  const { pathname } = useLocation();
+  // const { pathname } = useLocation();
   const { getToken } = useAuth();
 
   const navLinks = [
@@ -50,9 +50,8 @@ export default function Navbar() {
         },
       });
 
-      console.log("user credits at nav: ", data);
-
-      setCredits(data.credits);
+      // console.log("user credits at nav: ", data);
+      setCredits(data.userCredit);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.log("Error fetching credits: " + err.response?.data?.message);
@@ -66,7 +65,7 @@ export default function Navbar() {
         await getCreditsFromBackend();
       })();
     }
-  }, [user, pathname]);
+  }, [user]);
 
   return (
     <motion.nav

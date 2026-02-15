@@ -12,8 +12,8 @@ dotenv.config();
 const PORT = process.env.PORT || 3001;
 
 // Log env status at startup (helps debug 500s on Render – check Logs tab)
-if (!process.env.DATABASE_URL) console.warn("[startup] DATABASE_URL is not set – DB routes will fail");
-if (!process.env.CLERK_SECRET_KEY) console.warn("[startup] CLERK_SECRET_KEY is not set – auth routes may fail");
+if (!process.env.DATABASE_URL) console.warn("[startup] DATABASE_URL is not set: DB routes will fail");
+if (!process.env.CLERK_SECRET_KEY) console.warn("[startup] CLERK_SECRET_KEY is not set: auth routes may fail");
 
 // Middleware 
 app.use(
@@ -42,13 +42,7 @@ app.use(clerkMiddleware());
 app.use("/api/user", userRouter);
 app.use("/api/project", projectRouter);
 
-// Global error handler – log full error in Render logs so we can debug 500s
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("[server error]", err?.message);
-  console.error(err?.stack);
-  res.status(500).json({ error: "Internal Server Error" });
-});
-
+//listening server
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });

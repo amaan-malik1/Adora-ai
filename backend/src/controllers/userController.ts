@@ -5,8 +5,6 @@ import { prismaClient } from "../lib/prisma.js";
 export const getUserCredits = async (req: Request, res: Response) => {
     try {
         const { userId } = req.auth();
-        // console.log("UserId at credits controller: ", userId);
-
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized!" });
         }
@@ -14,10 +12,11 @@ export const getUserCredits = async (req: Request, res: Response) => {
         const user = await prismaClient.user.findUnique({
             where: { id: userId as string }
         });
-        console.log("User data at get credits: ", user);
 
-
-        return res.json({ credits: user?.credits });
+        return res.json({
+            message: "User credits fetched",
+            credits: user?.credits,
+        });
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.error("Error while getting user credits:", message);
