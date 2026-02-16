@@ -73,8 +73,16 @@ const Generate = () => {
         },
       });
 
-      toast.success(data.message);
-      navigate("/result/" + data.projectId);
+      //if not  projectId is cerated in DB
+      if (!data?.projectId) {
+        setIsGenerating(false);
+        toast.error("Project creation failed: Missing projectId");
+        return;
+      }
+
+      toast.success(data.message || "Project created successfully");
+
+      navigate(`/result/${data.projectId}`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.log(err.response?.data?.message);

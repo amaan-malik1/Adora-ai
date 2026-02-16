@@ -35,11 +35,13 @@ export const createProject = async (req: Request, res: Response) => {
     targetLength = 5,
   } = req.body;
 
-  const images: any = req.files;
+
+  const images = req.files as Express.Multer.File[];
+
 
 
   try {
-    if (images.length < 2 || !productName) {
+    if (!images || images.length < 2 || !productName) {
       return res.status(400).json({
         message: "Please upload at least 2 images",
       });
@@ -95,7 +97,7 @@ export const createProject = async (req: Request, res: Response) => {
     const generateContentConfig: GenerateContentConfig = {
       maxOutputTokens: 32768,
       temperature: 1,
-      topK: 0.95,
+      topK: 45,
       responseModalities: ['IMAGE'],
       imageConfig: {
         aspectRatio: aspectRatio || '9:16',
@@ -174,9 +176,13 @@ export const createProject = async (req: Request, res: Response) => {
     });
 
     //sending resposne to UI
-    return res.status(201).json({ projectId: project.id });
+    return res.status(201).json({
+      message: "Project created successfully",
+      projectId: project.id
+    });
+
   } catch (error: any) {
-    if (tempProjectId!) {
+    if (tempProjectId) {
       await prismaClient.project.update({
         where: {
           id: tempProjectId
@@ -198,9 +204,10 @@ export const createProject = async (req: Request, res: Response) => {
       })
     }
     console.log("Error while creating project image : ", error)
-    res.json({
-      message: "Internal server error: " + error
-    })
+    return res.status(500).json({
+      message: error.message || "Internal server error"
+    });
+
   }
 };
 
@@ -227,14 +234,13 @@ export const createVideo = async (req: Request, res: Response) => {
       }
     }).then(() => { isCreditsDeducted = true });
 
-    //finding project and making video with ccredit deduction
-    const project = await prismaClient.project.findUnique({
+    //finding project and making video with credit deduction
+    const project = await prismaClient.project.findFirst({
       where: {
         id: projectId,
         //@ts-ignore
         userId
       },
-      include: { user: true }
     });
 
     if (!projectId || project?.isGenerating) {
@@ -316,7 +322,7 @@ export const createVideo = async (req: Request, res: Response) => {
 
     fs.unlinkSync(filePath);
 
-    res.json({
+    return res.status(200).json({
       message: "Video generation completed!",
       videoURL: uploadResult.secure_url
     })
@@ -341,9 +347,10 @@ export const createVideo = async (req: Request, res: Response) => {
     }
 
     console.log("Error while : ", error)
-    res.json({
-      message: "Task not done!" + error
-    })
+    return res.status(500).json({
+      message: error.message || "Internal server error"
+    });
+
   }
 }
 
@@ -357,11 +364,12 @@ export const getAllPublishedProjects = async (req: Request, res: Response) => {
     res.json({
       projects: allProjects
     })
-  } catch (error) {
-    console.error("Fetch published projects error:", error);
+  } catch (error: any) {
+    console.error("Failed to load published projects:", error);
     return res.status(500).json({
-      message: "Failed to load projects",
+      message: error.message || "Internal server error"
     });
+
   }
 };
 

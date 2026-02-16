@@ -62,7 +62,7 @@ const Result = () => {
       fetchProjectsData();
     }, 10000);
     return () => clearInterval(interval);
-  }, [user, projectId, isGenerating]);
+  }, [user, projectId]);
 
   const handleGenerateVideo = async () => {
     if (!projectId) return;
