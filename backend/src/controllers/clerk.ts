@@ -39,7 +39,7 @@ const clerkWebHooks = async (req: Request, res: Response) => {
                 })
                 break;
 
-            case "payment_attempt.updated":
+            case "paymentAttempt.updated":
                 if ((data.charge_type === "recurring" || data.charge_type === "checkout") && data.status === "paid") {
                     const credits = { basic: 30, pro: 100, ultra: 350 }
                     const clerkUserId = data?.payer?.user_id;
@@ -65,9 +65,11 @@ const clerkWebHooks = async (req: Request, res: Response) => {
             default:
                 break;
         }
-        res.status(200).json({ received: true + type });
+        res.status(200).json({ message: "Webhook recieved: " + type });
 
     } catch (error: any) {
+        console.log("Error while creating webhook: ", error);
+
         res.status(500).json({
             message: error.message
         })
