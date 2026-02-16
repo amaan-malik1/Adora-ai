@@ -19,14 +19,12 @@ import axios from "axios";
 export default function Navbar() {
   const navigate = useNavigate();
   const { user } = useUser();
-  console.log("user details at nav:", user);
 
   const { openSignIn, openSignUp } = useClerk();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [credits, setCredits] = useState(0);
+  const [credit, setCredit] = useState(0);
 
-  // const { pathname } = useLocation();
   const { getToken } = useAuth();
 
   const navLinks = [
@@ -39,19 +37,16 @@ export default function Navbar() {
   const getCreditsFromBackend = async () => {
     try {
       const token = await getToken();
-      console.log("token: ", token);
 
-      if (!token) return toast("Please Login ");
-      console.log("Api instance: ", apiInstance);
+      if (!token) return toast("Please Login");
 
-      const { data } = await apiInstance.get("/api/user/credit", {
+      const { data } = await apiInstance.get("/api/user/credits", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      // console.log("user credits at nav: ", data);
-      setCredits(data.userCredit);
+      setCredit(data.credits);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.log("Error fetching credits: " + err.response?.data?.message);
@@ -128,7 +123,7 @@ export default function Navbar() {
               onClick={() => navigate("/plans")}
               className="border-none text-gray-300 sm:py-1.5"
             >
-              Credits: {credits}
+              Credits: {credit}
             </GhostButton>
 
             {/* user btn as menu  */}

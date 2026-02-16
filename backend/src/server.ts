@@ -1,4 +1,4 @@
-import express, { type NextFunction, type Request, type Response } from "express";
+import express, { type Request, type Response } from "express"
 import cors from "cors";
 import dotenv from "dotenv";
 import { clerkMiddleware } from "@clerk/express";
@@ -28,7 +28,7 @@ app.use(
 
 
 // Health check 
-app.get("/api/health", (req, res) => {
+app.get("/api/health", (req: Request, res: Response) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
@@ -36,7 +36,11 @@ app.get("/api/health", (req, res) => {
 app.post("/api/clerk", express.raw({ type: "application/json" }), clerkWebHooks);
 
 app.use(express.json());
-app.use(clerkMiddleware());
+app.use(clerkMiddleware({
+  publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+  secretKey: process.env.CLERK_SECRET_KEY
+}
+));
 
 // routes
 app.use("/api/user", userRouter);
