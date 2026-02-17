@@ -52,7 +52,7 @@ const clerkWebHooks = async (req: Request, res: Response) => {
                 break;
 
             case "user.deleted":
-                await prismaClient.user.delete({
+                await prismaClient.user.deleteMany({
                     where: { id: data.id },
                 })
                 break;
