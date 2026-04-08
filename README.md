@@ -31,6 +31,7 @@ This repository demonstrates real-world engineering practices such as structured
 Adora AI enables users to:
 - Authenticate securely
 - Generate AI-powered images
+- Generate AI-powered SHORT AD'S VIDEO
 - Organize outputs into projects
 - Explore community-generated content
 
