@@ -15,7 +15,7 @@ import { Toaster } from "react-hot-toast";
 function App() {
   return (
     <>
-      <Toaster toastOptions={{ style: { backgroundColor: "#333", color:'#fff'} }} />
+      <Toaster toastOptions={{ style: { backgroundColor: "#333", color: '#fff' } }} />
       <SoftBackdrop />
       <LenisScroll />
       <Navbar />
