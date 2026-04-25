@@ -44,9 +44,9 @@ export const getMyAllprojects = async (req: Request, res: Response) => {
             orderBy: { createdAt: 'desc' }
         });
 
-        res.status(201).json({
+        res.status(200).json({
             success: true,
-            myProjects: myAllProjects
+            projects: myAllProjects
         })
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
