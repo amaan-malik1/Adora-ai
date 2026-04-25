@@ -2,11 +2,12 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
-    "build": "tsc -b",
+    "start": "tsx src/server.ts",
     "dev": "nodemon --exec tsx src/server.ts",
-    "start": "tsx src/server.ts"
+    "build": "tsc -b",
+    "render:build": "prisma generate && prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
